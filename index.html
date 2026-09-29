@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #fff2f4; /* Soft aesthetic romantic plain color */
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            text-align: center;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 40px 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(230, 160, 175, 0.25);
+            max-width: 450px;
+            width: 90%;
+            border: 2px solid #fce4e8;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        h1 {
+            color: #d63384;
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.3rem;
+            margin-bottom: 25px;
+            line-height: 1.3;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            min-height: 100px;
+            position: relative;
+        }
+
+        button {
+            padding: 12px 28px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s ease, font-size 0.2s ease, background-color 0.3s ease;
+        }
+
+        .btn-yes {
+            background-color: #ff758f;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 117, 143, 0.4);
+            z-index: 10;
+        }
+
+        .btn-yes:hover {
+            background-color: #ff4d6d;
+        }
+
+        .btn-no {
+            background-color: #f8d7da;
+            color: #842029;
+            transition: all 0.3s ease;
+        }
+
+        .next-btn {
+            background-color: #c77dff;
+            color: white;
+            margin-top: 20px;
+            display: none;
+        }
+
+        /* Screen 3 styling */
+        .ring-screen {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #ffe5ec;
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        .yes-bg-btn {
+            position: absolute;
+            background-color: #ffb3c1;
+            color: #590d22;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            border: none;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .ring-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 200;
+            text-align: center;
+        }
+
+        .ring-emoji {
+            font-size: 5rem;
+            cursor: pointer;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.15));
+            animation: pulse 1.5s infinite alternate;
+            display: inline-block;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.2); }
+        }
+
+        .ring-text {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            color: #800f2f;
+            font-weight: 600;
+            display: none;
+        }
+
+        .final-congrats {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.8rem;
+            color: #c9184a;
+            display: none;
+            margin-top: 20px;
+            animation: fadeIn 1s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Container -->
+    <div class="container" id="mainCard">
+        <h1 id="questionText">Doo you like me?</h1>
+        
+        <div class="btn-container" id="btnGroup">
+            <button class="btn-yes" id="yesBtn" onclick="handleYes()">Yes</button>
+            <button class="btn-no" id="noBtn" onclick="handleNo()">No</button>
+        </div>
+
+        <button class="next-btn" id="nextBtn" onclick="goToStep3()">Next ❤️</button>
+    </div>
+
+    <!-- Step 3 Overlay Screen -->
+    <div class="ring-screen" id="ringScreen">
+        <!-- Yes buttons will be generated by JS -->
+        <div class="ring-container">
+            <h1 style="color: #590d22; font-size: 2rem; margin-bottom: 10px;">Will you marry me? 💍</h1>
+            <div class="ring-emoji" id="ringEmoji" onclick="handleRingClick()">💍</div>
+            <div class="ring-text" id="ringInstruction">Please click on ring option</div>
+            <div class="final-congrats" id="finalMsg">Congratulations 🎉 miss Turaba.</div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let noClickCount = 0;
+        let yesScale = 1;
+
+        const questionText = document.getElementById('questionText');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const ringScreen = document.getElementById('ringScreen');
+        const ringInstruction = document.getElementById('ringInstruction');
+        const finalMsg = document.getElementById('finalMsg');
+
+        function handleNo() {
+            noClickCount++;
+
+            if (currentStep === 1) {
+                // Yes button gets bigger
+                yesScale += 0.35;
+                yesBtn.style.transform = `scale(${yesScale})`;
+
+                // 3 clicks to disappear
+                if (noClickCount >= 3) {
+                    noBtn.style.display = 'none';
+                }
+            } else if (currentStep === 2) {
+                // Move No button away
+                const x = (Math.random() - 0.5) * 150;
+                const y = (Math.random() - 0.5) * 100;
+                noBtn.style.transform = `translate(${x}px, ${y}px)`;
+
+                // Yes button gets bigger
+                yesScale += 0.35;
+                yesBtn.style.transform = `scale(${yesScale})`;
+
+                if (noClickCount >= 3) {
+                    noBtn.style.display = 'none';
+                }
+            }
+        }
+
+        function handleYes() {
+            if (currentStep === 1) {
+                questionText.innerHTML = "ohhh thank you sooo much life I also love you Soo much 🙈";
+                resetButtons();
+                currentStep = 2;
+                setTimeout(() => {
+                    setupStep2();
+                }, 2000);
+            } else if (currentStep === 2) {
+                questionText.innerHTML = "picture Whatsapp kr dain thank you 🤭";
+                document.getElementById('btnGroup').style.display = 'none';
+                nextBtn.style.display = 'inline-block';
+            }
+        }
+
+        function resetButtons() {
+            noClickCount = 0;
+            yesScale = 1;
+            yesBtn.style.transform = 'scale(1)';
+            noBtn.style.display = 'inline-block';
+            noBtn.style.transform = 'translate(0, 0)';
+        }
+
+        function setupStep2() {
+            questionText.innerHTML = "Doo you send Mee your 5 pictures 👉🏻👈🏻";
+            resetButtons();
+        }
+
+        function goToStep3() {
+            document.getElementById('mainCard').style.display = 'none';
+            ringScreen.style.display = 'block';
+
+            // Generate many YES buttons in background
+            for (let i = 0; i < 40; i++) {
+                const yesBg = document.createElement('button');
+                yesBg.className = 'yes-bg-btn';
+                yesBg.innerText = 'YES!';
+                yesBg.style.top = Math.random() * 90 + 'vh';
+                yesBg.style.left = Math.random() * 90 + 'vw';
+                ringScreen.appendChild(yesBg);
+            }
+
+            // Show instruction text after 5 seconds
+            setTimeout(() => {
+                ringInstruction.style.display = 'block';
+            }, 5000);
+        }
+
+        function handleRingClick() {
+            ringInstruction.style.display = 'none';
+            finalMsg.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
